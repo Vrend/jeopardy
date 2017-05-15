@@ -9,6 +9,7 @@ def draw():
     background(58, 57, 253)
     draw_grid()
     draw_title()
+    draw_cats()
 
 
 def draw_title():
@@ -16,6 +17,15 @@ def draw_title():
     textAlign(CENTER)
     textSize(22)
     text("Jeopardy!", 390, 30)
+
+def draw_cats():
+    fill(255)
+    textSize(14)
+    text("Derivatives", 75, 70)
+    text("Integrals", 240, 70)
+    text("Function Analysis", 400, 70)
+    text("Related Rates", 555, 70)
+    text("Miscellaneous", 720, 70)
 
 def draw_grid():
     for x in range(1, 6):
