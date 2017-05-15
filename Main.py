@@ -6,6 +6,7 @@ state = 1
 
 def setup():
     size(800, 500)
+    frameRate(15)
 
 
 def draw():
@@ -20,11 +21,13 @@ def draw():
 
 def draw_points():
     for a in range(1, 6):
-        x = a/5.0 * 800
-        for b in range(1, 6):
-            y1 = (b-1)/5.0 * 500
-            y2 = b/5.0 * 500
-            text(str(b*100), x, y2)
+        x = a/5.0 * 800 - 80
+        text("100", x, 135)
+        text("200", x, 220)
+        text("300", x, 300)
+        text("400", x, 375)
+        text("500", x, 465)
+
 
 def draw_title():
     fill(r.randint(0, 255), r.randint(0, 255), r.randint(0, 255))
