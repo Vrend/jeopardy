@@ -287,8 +287,9 @@ def keyPressed():
             # if they hit enter on windows or return on mac
             elif key.code == ENTER or key.code == RETURN:
                 # moves to the next team
-                state = 2
-                selected_text_box = False
+                if len(team1.strip()) > 0:
+                    state = 2
+                    selected_text_box = False
     # same as above
     elif state == 2:
         if selected_text_box:
@@ -297,8 +298,9 @@ def keyPressed():
                     team2 = team2[0:len(team2) - 1]
             elif key.code == ENTER or key.code == RETURN:
                 # moves to game state
-                state = 3
-                selected_text_box = False
+                if len(team2.strip()) > 0:
+                    state = 3
+                    selected_text_box = False
     # if in the question state
     elif state == 4:
         # and the text box is selected
