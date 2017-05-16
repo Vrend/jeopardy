@@ -22,6 +22,8 @@ images = {}
 
 image_to_answer = {}
 
+wrong = {}
+
 solved = [[False, False, False, False, False], [False, False, False, False, False], [False, False, False, False, False], [False, False, False, False, False], [False, False, False, False, False]]
 
 selected_text_box = False
@@ -37,6 +39,12 @@ tries = 2
 stolen = False
 
 img = None
+
+
+def build_wrong():
+    for x in range(0, 5):
+        for y in range(0, 5):
+            wrong[(x, y)] = False
 
 
 def load_image():
@@ -57,13 +65,13 @@ def load_problems():
         if l == '':
             break
         problem = l.split(',')
-        print problem
         images[(categories[problem[1]], (int(problem[2])/100-1))] = problem[0]
         image_to_answer[problem[0]] = int(problem[3])
 
 
 def setup():
     global turn
+    build_wrong()
     turn = r.randint(1, 2)
     if not os.path.isdir(root+"/problems"):
         os.mkdir(root+"/problems")
@@ -117,7 +125,7 @@ def draw():
         rect(340, 325, 100, 50)
         fill(0)
         textSize(12)
-        text('Ok', 365, 355)
+        text('Ok', 385, 355)
 
     else:
         fill(255)
@@ -184,6 +192,7 @@ def keyPressed():
                         tries = 2
                         show_box = False
                         solved[selected_box[0]][selected_box[1]] = True
+                        wrong[selected_box] = True
                         state = 6
                     else:
                         answer_response = 'Sorry, that was wrong: but the other team can steal!'
@@ -242,31 +251,41 @@ def draw_enter():
 
 
 def draw_points():
-    global solved
+    global solved, wrong
     for a in range(1, 6):
         x = a / 5.0 * 800 - 80
 
-        if solved[a - 1][0]:
+        if wrong[(a-1, 0)]:
+            fill(255, 0, 0)
+        elif solved[a - 1][0]:
             fill(0, 255, 0)
         else:
             fill(255)
         text("100", x, 135)
-        if solved[a - 1][1]:
+        if wrong[(a-1, 1)]:
+            fill(255, 0, 0)
+        elif solved[a - 1][1]:
             fill(0, 255, 0)
         else:
             fill(255)
         text("200", x, 220)
-        if solved[a - 1][2]:
+        if wrong[(a-1, 2)]:
+            fill(255, 0, 0)
+        elif solved[a - 1][2]:
             fill(0, 255, 0)
         else:
             fill(255)
         text("300", x, 300)
-        if solved[a - 1][3]:
+        if wrong[(a-1, 3)]:
+            fill(255, 0, 0)
+        elif solved[a - 1][3]:
             fill(0, 255, 0)
         else:
             fill(255)
         text("400", x, 375)
-        if solved[a - 1][4]:
+        if wrong[(a-1, 4)]:
+            fill(255, 0, 0)
+        elif solved[a - 1][4]:
             fill(0, 255, 0)
         else:
             fill(255)
