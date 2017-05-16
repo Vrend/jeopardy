@@ -16,7 +16,7 @@ answer = ''
 
 answer_response = ''
 
-categories = {'Derivatives': 0, 'Integrals': 1, 'Function Analysis': 2, "Misc": 3}
+categories = {'Derivatives': 0, 'Integrals': 1, 'Function Analysis': 2, "Related Rates": 3, "Misc": 4}
 
 images = {}
 
@@ -36,15 +36,24 @@ tries = 2
 
 stolen = False
 
+img = None
+
+def load_image():
+    global img
+    path = root + '/problems/' + images[selected_box]
+    img = loadImage(path)
+
+
 def load_problems():
     global images, categories, image_to_answer
     problems = open(root+'/problem_list', 'r')
     while True:
         l = problems.readline()
-        if l is None:
+        if l == '':
             break
         problem = l.split(',')
-        images[(categories[problem[1]], (int(problem[2])/100-1))] = problems[0]
+        print problem
+        images[(categories[problem[1]], (int(problem[2])/100-1))] = problem[0]
         image_to_answer[problem[0]] = int(problem[3])
 
 
@@ -54,6 +63,7 @@ def setup():
     if not os.path.isfile(root+'/problem_list'):
         problems = open(root+'/problem_list', 'w+')
         problems.close()
+    load_problems()
     size(800, 500)
     frameRate(15)
 
@@ -65,7 +75,7 @@ def draw():
     if state == 0:
         draw_enter()
 
-    if state == 3:
+    elif state == 3:
         if show_box:
             state = 4
         strokeWeight(2)
@@ -74,15 +84,28 @@ def draw():
         draw_cats()
         draw_points()
 
-    if state == 4:
+    elif state == 4:
         draw_title()
         draw_text_box()
+        draw_image()
+
+    else:
+        fill(255)
+        textAlign(CENTER)
+        textSize(250)
+        text("Error", 400, 300)
+
+
+def draw_image():
+    global img
+    image(img, 250, 50, 300, 300)
 
 
 def check_answer(num):
     global selected_box
     ans = image_to_answer[images[selected_box]]
-    if (ans - .005) <= num <= (ans + .005):
+    print ans
+    if (ans - .005) <= int(num) <= (ans + .005):
         return True
     return False
 
@@ -96,7 +119,9 @@ def keyPressed():
                 if len(answer) > 0:
                     answer = answer[0:len(answer)-1]
             elif key.code == ENTER or key.code == RETURN:
+                print "Checking answer"
                 if check_answer(answer):
+                    print "correct"
                     answer_response = 'Correct!'
                     time.sleep(1)
                     answer_response = ''
@@ -112,7 +137,7 @@ def keyPressed():
                 else:
                     tries -= 1
                     if tries == 0:
-                        answer_response = 'The answer was: ' + image_to_answer[images[selected_box]]
+                        answer_response = 'The answer was: ' + str(image_to_answer[images[selected_box]])
                         tries = 2
                         time.sleep(1)
                         show_box = False
@@ -172,27 +197,27 @@ def draw_points():
     for a in range(1, 6):
         x = a / 5.0 * 800 - 80
 
-        if(solved[a-1][0] == True):
+        if solved[a - 1][0]:
             fill(0, 255, 0)
         else:
             fill(255)
         text("100", x, 135)
-        if(solved[a-1][1] == True):
+        if solved[a - 1][1]:
             fill(0, 255, 0)
         else:
             fill(255)
         text("200", x, 220)
-        if(solved[a-1][2] == True):
+        if solved[a - 1][2]:
             fill(0, 255, 0)
         else:
             fill(255)
         text("300", x, 300)
-        if(solved[a-1][3] == True):
+        if solved[a - 1][3]:
             fill(0, 255, 0)
         else:
             fill(255)
         text("400", x, 375)
-        if(solved[a-1][4] == True):
+        if solved[a - 1][4]:
             fill(0, 255, 0)
         else:
             fill(255)
@@ -241,6 +266,8 @@ def mouseClicked():
     x = mouse.x
     y = mouse.y
 
+    print x, y
+
     if state == 0:
         if 340 < x < 440 and 325 < y < 375:
             state = 3
@@ -256,21 +283,29 @@ def mouseClicked():
                 break
         for b in range(1, 6):
             y1 = (b - 1) / 6.0 * 500
+            if y1 == 0:
+                y1 = 85
             y2 = b / 6.0 * 500
             if y2 > y > y1:
                 v2 = b - 2
                 break
+            elif y > 420:
+                v2 = 4
+
         if v2 is None:
-            v2 = 4
+            return
+
+        if solved[v1][v2]:
+            return
         show_box = True
         selected_box = (v1, v2)
         state = 4
+        load_image()
 
     elif state == 4:
         if 340 < x < 440 and 375 < y < 425:
             selected_text_box = True
         else:
             selected_text_box = False
-
 
 run()
