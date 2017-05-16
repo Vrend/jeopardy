@@ -115,7 +115,7 @@ def load_problems():
         # divides it by 100, and subtracts one, because it's a zero based index
         images[(categories[problem[1]], (int(problem[2]) / 100 - 1))] = problem[0]
         # assigns the name of the picture as the key and the answer as the value in the 'image_to_answer' dictionary
-        image_to_answer[problem[0]] = int(problem[3])
+        image_to_answer[problem[0]] = problem[3]
 
 
 # run at the beginning of the program
@@ -261,8 +261,12 @@ def check_answer(num):
     # plugs in the currently selected box to get the image name, which is used to get the answer
     ans = image_to_answer[images[selected_box]]
     # if the num parameter when casted to float (because it was a string) is within the margin, it returns true
-    if (ans - .005) <= float(num) <= (ans + .005):
-        return True
+    try:
+        if (float(ans) - .005) <= float(num) <= (float(ans) + .005):
+            return True
+    except:
+        if str(ans) == str(num):
+            return True
     return False
 
 
@@ -388,11 +392,9 @@ def keyTyped():
     global answer, state, selected_text_box, team1, team2
     thing = key.char
     if state == 4:
-        # only adds numbers to the answer if it is selected
+        # only adds to the answer if it is selected
         if selected_text_box:
-            # can only allow numbers and periods for answer
-            if '0123456789.'.__contains__(thing):
-                answer += thing
+            answer += thing
     # if selecting name of team, make sure it isn't longer than 15
     elif state == 1:
         if selected_text_box:
