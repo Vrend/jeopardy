@@ -40,6 +40,9 @@ stolen = False
 
 img = None
 
+double_points = (-1, -1)
+
+last_question = False
 
 def build_wrong():
     for x in range(0, 5):
@@ -70,9 +73,10 @@ def load_problems():
 
 
 def setup():
-    global turn
+    global turn, double_points
     build_wrong()
     turn = r.randint(1, 2)
+    double_points = (r.randint(0, 4), r.randint(0, 4))
     if not os.path.isdir(root+"/problems"):
         os.mkdir(root+"/problems")
     if not os.path.isfile(root+'/problem_list'):
@@ -84,7 +88,7 @@ def setup():
 
 
 def draw():
-    global show_box, selected_box, state, answer, answer_response
+    global show_box, selected_box, state, answer, answer_response, double_points, last_question
     background(58, 57, 253)
 
     if state == 0:
@@ -122,6 +126,10 @@ def draw():
         draw_image()
         fill(255)
         text(answer_response, 350, 450)
+        if selected_box == double_points or last_question:
+            fill(r.randint(0, 255), r.randint(0, 255), r.randint(0, 255))
+            textSize(48)
+            text("Double points!!!", 380, 480)
 
     elif state == 6:
         draw_title()
@@ -132,11 +140,27 @@ def draw():
         textSize(12)
         text('Ok', 385, 355)
 
+    elif state == 7:
+        fill(r.randint(0, 255), r.randint(0, 255), r.randint(0, 255))
+        textSize(48)
+        fin = ' wins with '
+        if score1 > score2:
+            fin = team1 + fin + str(score1) + ' points!'
+        elif score2 > score1:
+            fin = team2 + fin + str(score2) + ' points!'
+        else:
+            fin = "Tie?"
+        text(fin, 100, 200, 600, 200)
+        textSize(12)
+        fill(255)
+        text('Press esc to quit.', 350, 350)
+
     else:
         fill(255)
         textAlign(CENTER)
         textSize(250)
         text("Error", 400, 300)
+
 
 def draw_scores():
     global score1, score2, team1, team2
@@ -158,9 +182,8 @@ def check_answer(num):
     return False
 
 
-
 def keyPressed():
-    global answer, selected_text_box, state, answer_response, selected_box, show_box, tries, image_to_answer, images, solved, turn, stolen, team1, team2
+    global answer, selected_text_box, state, answer_response, selected_box, show_box, tries, image_to_answer, images, solved, turn, stolen, team1, team2, last_question
     if state == 1:
         if selected_text_box:
             if key.code == BACKSPACE or key.code == DELETE:
@@ -210,15 +233,31 @@ def keyPressed():
                         turn = turn % 2 + 1
                         stolen = True
                 answer = ''
+                count = 0
+                for x in solved:
+                    for y in x:
+                        if not y:
+                            count += 1
+                if count == 1:
+                    last_question = True
+                elif count == 0:
+                    state = 7
+
+
 
 def add_points(num):
-    global turn, score1, score2
+    global turn, score1, score2, double_points, selected_box
+
+    if selected_box == double_points:
+        num *= 2
+
     if turn == 1:
         score1 += num
     elif turn == 2:
         score2 += num
     else:
         print "Problem with scoring"
+
 
 def keyTyped():
     global answer, state, selected_text_box, team1, team2
@@ -237,6 +276,7 @@ def keyTyped():
         if selected_text_box:
             if len(team2) <= 15:
                 team2 += key.char
+
 
 def draw_text_box():
     global selected_text_box, answer
