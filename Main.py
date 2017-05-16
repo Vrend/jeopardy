@@ -93,14 +93,18 @@ def draw():
     elif state == 1:
         draw_title()
         fill(255)
-        text("Enter team 1 name", 350, 225, 100, 50)
+        textSize(18)
+        text("Enter team 1 name", 350, 225)
         draw_text_box()
+        text(team1, 390, 410)
 
     elif state == 2:
         draw_title()
         fill(255)
-        text("Enter team 2 name", 350, 225, 100, 50)
+        textSize(18)
+        text("Enter team 2 name", 350, 225)
         draw_text_box()
+        text(team2, 390, 410)
 
     elif state == 3:
         if show_box:
@@ -110,6 +114,7 @@ def draw():
         draw_title()
         draw_cats()
         draw_points()
+        draw_scores()
 
     elif state == 4:
         draw_title()
@@ -132,6 +137,12 @@ def draw():
         textAlign(CENTER)
         textSize(250)
         text("Error", 400, 300)
+
+def draw_scores():
+    global score1, score2, team1, team2
+    fill(255)
+    text(team1+': '+str(score1), 100, 20)
+    text(team2+': '+str(score2), 700, 20)
 
 
 def draw_image():
@@ -219,11 +230,13 @@ def keyTyped():
 
     elif state == 1:
         if selected_text_box:
-            team1 += key.char\
+            if len(team1) <= 15:
+                team1 += key.char
 
     elif state == 2:
         if selected_text_box:
-            team2 += key.char
+            if len(team2) <= 15:
+                team2 += key.char
 
 def draw_text_box():
     global selected_text_box, answer
@@ -336,7 +349,14 @@ def mouseClicked():
 
     if state == 0:
         if 340 < x < 440 and 325 < y < 375:
-            state = 3
+            state = 1
+
+    elif state == 1 or state == 2:
+        if 340 < x < 440 and 375 < y < 425:
+            selected_text_box = True
+        else:
+            selected_text_box = False
+
     elif state == 6:
         if 340 < x < 440 and 325 < y < 375:
             state = 3
