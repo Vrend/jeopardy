@@ -38,10 +38,15 @@ stolen = False
 
 img = None
 
+
 def load_image():
-    global img
-    path = root + '/problems/' + images[selected_box]
-    img = loadImage(path)
+    global img, state
+    try:
+        path = root + '/problems/' + images[selected_box]
+        img = loadImage(path)
+    except:
+        print "Error loading image"
+        state = 5
 
 
 def load_problems():
@@ -58,6 +63,8 @@ def load_problems():
 
 
 def setup():
+    global turn
+    turn = r.randint(1, 2)
     if not os.path.isdir(root+"/problems"):
         os.mkdir(root+"/problems")
     if not os.path.isfile(root+'/problem_list'):
@@ -69,11 +76,23 @@ def setup():
 
 
 def draw():
-    global show_box, selected_box, state, answer
+    global show_box, selected_box, state, answer, answer_response
     background(58, 57, 253)
 
     if state == 0:
         draw_enter()
+
+    elif state == 1:
+        draw_title()
+        fill(255)
+        text("Enter team 1 name", 350, 225, 100, 50)
+        draw_text_box()
+
+    elif state == 2:
+        draw_title()
+        fill(255)
+        text("Enter team 2 name", 350, 225, 100, 50)
+        draw_text_box()
 
     elif state == 3:
         if show_box:
@@ -88,6 +107,17 @@ def draw():
         draw_title()
         draw_text_box()
         draw_image()
+        fill(255)
+        text(answer_response, 350, 450)
+
+    elif state == 6:
+        draw_title()
+        fill(255)
+        text(answer_response, 400, 300)
+        rect(340, 325, 100, 50)
+        fill(0)
+        textSize(12)
+        text('Ok', 365, 355)
 
     else:
         fill(255)
@@ -104,7 +134,6 @@ def draw_image():
 def check_answer(num):
     global selected_box
     ans = image_to_answer[images[selected_box]]
-    print ans
     if (ans - .005) <= int(num) <= (ans + .005):
         return True
     return False
@@ -112,16 +141,30 @@ def check_answer(num):
 
 
 def keyPressed():
-    global answer, selected_text_box, state, answer_response, selected_box, show_box, tries, image_to_answer, images, solved, turn, stolen
-    if state == 4:
+    global answer, selected_text_box, state, answer_response, selected_box, show_box, tries, image_to_answer, images, solved, turn, stolen, team1, team2
+    if state == 1:
+        if selected_text_box:
+            if key.code == BACKSPACE or key.code == DELETE:
+                if len(team1) > 0:
+                    team1 = team1[0:len(team1)-1]
+            elif key.code == ENTER or key.code == RETURN:
+                state = 2
+                selected_text_box = False
+    elif state == 2:
+        if selected_text_box:
+            if key.code == BACKSPACE or key.code == DELETE:
+                if len(team2) > 0:
+                    team2 = team2[0:len(team2)-1]
+            elif key.code == ENTER or key.code == RETURN:
+                state = 3
+                selected_text_box = False
+    elif state == 4:
         if selected_text_box:
             if key.code == BACKSPACE or key.code == DELETE:
                 if len(answer) > 0:
                     answer = answer[0:len(answer)-1]
             elif key.code == ENTER or key.code == RETURN:
-                print "Checking answer"
                 if check_answer(answer):
-                    print "correct"
                     answer_response = 'Correct!'
                     time.sleep(1)
                     answer_response = ''
@@ -139,10 +182,9 @@ def keyPressed():
                     if tries == 0:
                         answer_response = 'The answer was: ' + str(image_to_answer[images[selected_box]])
                         tries = 2
-                        time.sleep(1)
                         show_box = False
                         solved[selected_box[0]][selected_box[1]] = True
-                        state = 4
+                        state = 6
                     else:
                         answer_response = 'Sorry, that was wrong: but the other team can steal!'
                         turn = turn % 2 + 1
@@ -159,13 +201,20 @@ def add_points(num):
         print "Problem with scoring"
 
 def keyTyped():
-    global answer, state, selected_text_box
+    global answer, state, selected_text_box, team1, team2
     thing = key.char
     if state == 4:
         if selected_text_box:
             if '0123456789.'.__contains__(thing):
                 answer += thing
 
+    elif state == 1:
+        if selected_text_box:
+            team1 += key.char\
+
+    elif state == 2:
+        if selected_text_box:
+            team2 += key.char
 
 def draw_text_box():
     global selected_text_box, answer
@@ -262,15 +311,17 @@ def draw_grid():
 
 
 def mouseClicked():
-    global state, show_box, selected_box, selected_text_box
+    global state, show_box, selected_box, selected_text_box, answer_response
     x = mouse.x
     y = mouse.y
-
-    print x, y
 
     if state == 0:
         if 340 < x < 440 and 325 < y < 375:
             state = 3
+    elif state == 6:
+        if 340 < x < 440 and 325 < y < 375:
+            state = 3
+            answer_response = ''
 
     elif state == 3:
         v1 = None
