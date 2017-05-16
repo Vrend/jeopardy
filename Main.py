@@ -43,6 +43,7 @@ double_points = (-1, -1)
 
 last_question = False
 
+
 def build_wrong():
     for x in range(0, 5):
         for y in range(0, 5):
@@ -241,7 +242,6 @@ def keyPressed():
                     last_question = True
                 elif count == 0:
                     state = 7
-
 
 
 def add_points(num):
