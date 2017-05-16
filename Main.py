@@ -1,7 +1,6 @@
 from pyprocessing import *
 import random as r
 import os
-import time
 
 state = 0
 
@@ -177,7 +176,7 @@ def draw_image():
 def check_answer(num):
     global selected_box
     ans = image_to_answer[images[selected_box]]
-    if (ans - .005) <= int(num) <= (ans + .005):
+    if (ans - .005) <= float(num) <= (ans + .005):
         return True
     return False
 
@@ -207,14 +206,13 @@ def keyPressed():
                     answer = answer[0:len(answer)-1]
             elif key.code == ENTER or key.code == RETURN:
                 if check_answer(answer):
-                    answer_response = 'Correct!'
-                    time.sleep(1)
                     answer_response = ''
                     add_points((selected_box[1]+1)*100)
                     show_box = False
                     tries = 2
                     solved[selected_box[0]][selected_box[1]] = True
                     state = 3
+                    selected_text_box = False
                     if not stolen:
                         turn = turn % 2 + 1
                     else:
@@ -228,6 +226,7 @@ def keyPressed():
                         solved[selected_box[0]][selected_box[1]] = True
                         wrong[selected_box] = True
                         state = 6
+                        selected_text_box = False
                     else:
                         answer_response = 'Sorry, that was wrong: but the other team can steal!'
                         turn = turn % 2 + 1
