@@ -2,6 +2,8 @@ from pyprocessing import *
 import random as r
 import os
 
+# By John Broderick
+
 # the pyprocessing import copies everything (*) into the program from that file, allowing for the game to work
 # added the random file with the alias r, which allows it to be
 # called like this: r.randint(x, y) vs random.randint(x, y)
@@ -48,6 +50,9 @@ wrong = {}
 solved = [[False, False, False, False, False], [False, False, False, False, False], [False, False, False, False, False],
           [False, False, False, False, False], [False, False, False, False, False]]
 
+# symbol list
+symbols = {'5': '%', '6': '^', '8': '*', '=': '+', '9': '(', '0': ')', '7': '&', ',': '<', '.': '>'}
+
 # variable for detecting whether or not a text box is 'active'
 selected_text_box = False
 
@@ -74,6 +79,8 @@ double_points = (-1, -1)
 
 # when this is true, it will be the last question, which is worth double
 last_question = False
+
+shift = False
 
 
 # this function creates a dictionary of (x, y) coordinates that correspond to a boolean. This can be used to determine if a question was wrong
@@ -251,7 +258,7 @@ def draw_scores():
 # uses the img variable to draw the image on the screen
 def draw_image():
     global img
-    image(img, 250, 50, 300, 300)
+    image(img, 250, 50, 500, 300)
 
 
 # takes in a number and compares it to the answer,
@@ -261,18 +268,20 @@ def check_answer(num):
     # plugs in the currently selected box to get the image name, which is used to get the answer
     ans = image_to_answer[images[selected_box]]
     # if the num parameter when casted to float (because it was a string) is within the margin, it returns true
+    print ans
+    print num
     try:
         if (float(ans) - .005) <= float(num) <= (float(ans) + .005):
             return True
     except:
-        if str(ans) == str(num):
+        if str(ans).strip() == str(num).strip():
             return True
     return False
 
 
 # used to detect if the control keys are pressed (backspace and return)
 def keyPressed():
-    global answer, selected_text_box, state, answer_response, selected_box, show_box, tries, image_to_answer, images, solved, turn, stolen, team1, team2, last_question
+    global answer, selected_text_box, state, answer_response, selected_box, show_box, tries, image_to_answer, images, solved, turn, stolen, team1, team2, shift, last_question
     # when selecting names, this detects when to move to the other team, as well as
     # when they delete a character and when the name is too big
     if state == 1:
@@ -307,11 +316,15 @@ def keyPressed():
         if selected_text_box:
             # and the user types backspace or delete
             if key.code == BACKSPACE or key.code == DELETE:
+                shift = False
                 if len(answer) > 0:
                     # it will delete the last character, if the length isn't zero
                     answer = answer[0:len(answer) - 1]
+            elif key.code == SHIFT:
+                shift = not shift
             # if the user presses enter or return
             elif key.code == ENTER or key.code == RETURN:
+                shift = False
                 # it will check the answer, and if it's true
                 if check_answer(answer):
                     # answer response is reset
@@ -391,12 +404,18 @@ def add_points(num):
 
 # handles when users type in numbers, letters, or grammar keys
 def keyTyped():
-    global answer, state, selected_text_box, team1, team2
+    global answer, state, selected_text_box, team1, team2, symbols
     thing = key.char
     if state == 4:
         # only adds to the answer if it is selected
         if selected_text_box:
-            answer += thing
+            try:
+                if shift:
+                    answer += symbols[thing]
+                else:
+                    answer += thing
+            except:
+                answer += thing
     # if selecting name of team, make sure it isn't longer than 15
     elif state == 1:
         if selected_text_box:
