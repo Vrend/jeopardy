@@ -374,7 +374,7 @@ def keyPressed():
                 # in any case, clear the answer
                 answer = ''
                 # and count how many problems are left. If only one is left,
-                # activate last_question. If one is left, then move to the winning state, state 7
+                # activate last_question. If none are left, then move to the winning state, state 7
                 count = 0
                 for x in solved:
                     for y in x:
