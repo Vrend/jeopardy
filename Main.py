@@ -268,8 +268,6 @@ def check_answer(num):
     # plugs in the currently selected box to get the image name, which is used to get the answer
     ans = image_to_answer[images[selected_box]]
     # if the num parameter when casted to float (because it was a string) is within the margin, it returns true
-    print ans
-    print num
     try:
         if (float(ans) - .005) <= float(num) <= (float(ans) + .005):
             return True
